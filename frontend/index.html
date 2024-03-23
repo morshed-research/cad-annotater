@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CAD Annotation Tool</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.0/fabric.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    
+    <div id="sidebar">
+        <!-- Group 1: Upload and Download Buttons -->
+        <div class="button-group">
+            <label for="upload-file" class="custom-file-upload">Upload Image</label>
+            <input type="file" id="upload-file" accept=".svg, .png, jpg, jpeg" />
+            <button id="download-button">Download JSON</button>
+        </div>
+    
+        <!-- Divider -->
+        <div class="button-divider"></div>
+    
+        <!-- Group 2: Edit and Delete Buttons -->
+        <div class="button-group">
+            <button id="edit-button">Start Editing</button>
+            <button id="delete-button">Delete</button>
+        </div>
+
+        <!-- Node Size Slider -->
+        <div class="slider-container">
+            <label for="node-size-slider">Node Size</label>
+            <input type="range" id="node-size-slider" min="10" max="50" value="20">
+        </div>
+    </div>
+
+    <div id="main-content">
+        <canvas id="canvas" width="800" height="600"></canvas>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

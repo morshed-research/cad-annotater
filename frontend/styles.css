@@ -1,0 +1,103 @@
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* padding-bottom: 60px; Adjust based on the height of your footer */
+}
+
+canvas {
+    border: 1px solid #cccccc; /* Light grey border */
+}
+
+button, .custom-file-upload {
+    background-color: rgb(76, 172, 175); /* Green background */
+    color: white; /* White text color */
+    width: 180px; /* Adjust the width as needed */
+    height: 50px; /* Adjust the height as needed */
+    line-height: 50px; /* Align text vertically */
+    padding: 0; /* Padding can affect the overall size, so it's set to 0 */
+    font-size: 16px; /* Ensure consistent font size */
+    font-family: Arial, sans-serif; /* Ensure consistent font family */
+    text-align: center; /* Center the text */
+    border-radius: 8px; /* Consistent border radius */
+    display: inline-block;
+    margin: 10px 0; /* Consistent margin for spacing */
+    cursor: pointer; /* Cursor to pointer to indicate clickability */
+    transition: background-color 0.3s; /* Smooth transition for hover effect */
+}
+
+#sidebar button, .custom-file-upload {
+    width: 80%; /* Adjust the width as needed, or use a fixed width like 180px */
+}
+
+#upload-file {
+    display: none; /* Hide the default file input */
+}
+
+.custom-file-upload:hover, button:hover {
+    background-color: rgb(111, 185, 225); /* Consistent hover effect */
+}
+
+#sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 250px; /* Adjust the width as needed */
+    height: 100%;
+    background-color: #f5f5f5; /* Light grey background */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center align the buttons */
+    padding: 10px;
+    z-index: 1000; /* Ensure the sidebar is on top */
+}
+
+#main-content {
+    margin-left: 250px; /* This should match the sidebar's width */
+    height: 100%;
+    width: calc(100% - 250px); /* Adjust the width to take the sidebar into account */
+}
+
+.button-group {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px; /* Space below each button group */
+}
+
+.button-divider {
+    width: 80%; /* Match the width of the buttons */
+    height: 2px; /* Thickness of the divider */
+    background-color: #cccccc; /* Color of the divider */
+    margin: 0 auto; /* Center the divider horizontally */
+    margin-bottom: 10px; /* Space below the divider */
+}
+
+.slider-container {
+    width: 80%;
+    margin: 10px auto; /* Center the slider horizontally with margin */
+}
+
+#node-size-slider {
+    width: 100%;
+}
+
+#edit-button {
+    background-color: green; /* Initial green color for Edit button */
+}
+
+#delete-button {
+    background-color: grey; /* Disabled look for Delete button */
+    cursor: not-allowed; /* Show that the button is not clickable */
+}
+
+/* Add classes for active states */
+.edit-active {
+    background-color: red !important; /* Red when editing */
+}
+
+.delete-active {
+    background-color: red !important; /* Red when active */
+    cursor: pointer; /* Revert cursor to default */
+}
