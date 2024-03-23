@@ -21,7 +21,7 @@ These instructions will help you get a copy of the project up and running on you
 
 Ensure you have the following installed:
 
-- [Python](https://www.python.org/downloads/)
+- [Python3](https://www.python.org/downloads/)
 
 ### Installation
 
@@ -31,3 +31,10 @@ Ensure you have the following installed:
 git clone https://github.com/yourusername/cad-annotater.git
 cd cad-annotater
 pip install -r requirements.txt
+```
+
+### Running
+```bash
+cd cad-annotater
+python app.py
+```
