@@ -1,8 +1,8 @@
-# CAD-Annotater
+# CAD-Annotator
 
-CAD-Annotater is a web-based tool designed for annotating CAD images. Users can upload images, add interactive nodes, connect nodes with edges, and export the annotated graph in JSON format. The tool is built with Flask and provides an intuitive interface for editing and annotating CAD drawings.
+CAD-Annotator is a web-based tool designed for annotating CAD images. Users can upload images, add interactive nodes, connect nodes with edges, and export the annotated graph in JSON format. The tool is built with Flask and provides an intuitive interface for editing and annotating CAD drawings.
 
-![CAD Annotator Screenshot](figures/cad-annotater-pic.png)
+![CAD Annotator Screenshot](figures/cad-annotator-pic.png)
 
 
 ## Features
@@ -28,13 +28,13 @@ Ensure you have the following installed:
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/cad-annotater.git
-cd cad-annotater
+git clone https://github.com/yourusername/cad-annotator.git
+cd cad-annotator
 pip install -r requirements.txt
 ```
 
 ### Running
 ```bash
-cd cad-annotater
+cd cad-annotator
 python app.py
 ```
