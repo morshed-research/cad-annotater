@@ -1,3 +1,5 @@
+var img_scale;
+
 $(document).ready(function() {
     // Initialize canvas and setup environment
     var canvas = new fabric.Canvas('canvas', {
@@ -170,6 +172,7 @@ $(document).ready(function() {
     function loadImageOnCanvas(dataUrl) {
         fabric.Image.fromURL(dataUrl, (oImg) => {
             var scale = Math.min(canvas.width / oImg.width, canvas.height / oImg.height);
+            img_scale = scale;
             oImg.set({ left: 0, top: 0, scaleX: scale, scaleY: scale, selectable: false, evented: false });
             canvas.clear();
             canvas.add(oImg);
@@ -266,8 +269,8 @@ $(document).ready(function() {
 
         nodes.forEach(node => {
             // Adjust node coordinates relative to the image's top-left corner
-            var xRelativeToImage = (node.left - offsetX) / scale;
-            var yRelativeToImage = (node.top - offsetY) / scale;
+            var xRelativeToImage = (node.left - offsetX) / img_scale;
+            var yRelativeToImage = (node.top - offsetY) / img_scale;
 
             graph.nodes.push({
                 id: node.id, // Node id
