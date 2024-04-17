@@ -1,5 +1,3 @@
-var img_scale;
-
 $(document).ready(function() {
     // Initialize canvas and setup environment
     var canvas = new fabric.Canvas('canvas', {
@@ -11,16 +9,18 @@ $(document).ready(function() {
     // Initially disable the delete button
     $('#delete-button').prop('disabled', true);
     
+    var img_scale, offsetX, offsetY;
     var nodes = [], edges = [];
     var firstNode = null, tempLine = null, nodeIdCounter = 0;
     var isDragging = false, editMode = false;
     var DRAG_THRESHOLD = 10, clickStartX = 0, clickStartY = 0;
+    var backgroundImage = canvas.backgroundImage;
 
     $('#edit-button').prop('disabled', true);
 
     // Node creation function  
     function addNode(left, top, nodeId, initialName = "Node") {
-    
+
         // Retrieve the current node size from the slider
         var size = parseInt(document.getElementById('node-size-slider').value, 10);
 
@@ -42,7 +42,7 @@ $(document).ready(function() {
 
         });
 
-        var text = new fabric.Text(initialName + nodeId, {
+        var text = new fabric.Text(initialName, {
             fontSize: size,
             left: 0,  // Position inside group
             top: 25,  // Position inside group, below the circle
@@ -55,7 +55,7 @@ $(document).ready(function() {
     
         var group = new fabric.Group([circle, text], {
             id: nodeId,
-            name: initialName + nodeId,
+            name: initialName,
             left: left,  // Position on canvas
             top: top,    // Position on canvas
             originX: 'center',
@@ -258,14 +258,14 @@ $(document).ready(function() {
 
     // Download JSON representation of the graph
     $('#download-button').click(function() {
-        var graph = { nodes: [], edges: [] };
-        var backgroundImage = canvas.backgroundImage;
-
         // Only calculate the offsets and scaling if a background image is present
         // Assuming uniform scaling for X and Y
         var scale = backgroundImage ? backgroundImage.scaleX : 1; 
-        var offsetX = backgroundImage ? backgroundImage.left * scale : 0;
-        var offsetY = backgroundImage ? backgroundImage.top * scale : 0;
+        offsetX = backgroundImage ? backgroundImage.left * scale : 0;
+        offsetY = backgroundImage ? backgroundImage.top * scale : 0;
+        alert(img_scale + " vs " + scale)
+
+        var graph = { nodes: [], edges: [], scale: [img_scale, scale] };
 
         nodes.forEach(node => {
             // Adjust node coordinates relative to the image's top-left corner
@@ -286,7 +286,7 @@ $(document).ready(function() {
                 id_2: edge.node2.id
             });
         });
-
+        
         console.log(graph)
         // Create a Blob from the JSON data
         var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(graph));
@@ -297,6 +297,62 @@ $(document).ready(function() {
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
     });
+
+    // Function to handle JSON upload
+    function handleJSONUpload(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+
+        var reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                var jsonObj = JSON.parse(event.target.result);
+                loadGraphFromJSON(jsonObj);
+            } catch (error) {
+                alert('Error parsing JSON: ' + error);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // Function to load graph from JSON object
+    function loadGraphFromJSON(jsonObj) {
+        // canvas.clear();
+        nodes = [];  // Clear existing nodes array
+        edges = [];  // Clear existing edges array
+        
+        var scale = backgroundImage ? backgroundImage.scaleX : 1; 
+        offsetX = backgroundImage ? backgroundImage.left * scale : 0;
+        offsetY = backgroundImage ? backgroundImage.top * scale : 0;
+
+        jsonObj.nodes.forEach(node => {
+            addNode(node.x * img_scale + offsetX, node.y * img_scale + offsetY, node.id, node.name);
+        });
+
+        jsonObj.edges.forEach(edge => {
+            var node1 = nodes.find(n => n.id === edge.id_1);
+            var node2 = nodes.find(n => n.id === edge.id_2);
+            if (node1 && node2) {
+                var edge = new fabric.Line([node1.left, node1.top, node2.left, node2.top], {
+                    node1: node1,
+                    node2: node2,
+                    selectable: true,
+                    lockMovementX: true,
+                    lockMovementY: true,
+                    hasControls: false,
+                    stroke: '#000',
+                    strokeWidth: 3,
+                    selectable: false,
+                });
+
+                canvas.add(edge);
+                edge.moveTo(1);
+                edges.push(edge);
+            }
+        });
+        canvas.renderAll();
+    }
+    document.getElementById('upload-json').addEventListener('change', handleJSONUpload);
 
     // Delete node using button or keyboard
     document.getElementById('delete-button').addEventListener('click', deleteSelectedObject);
