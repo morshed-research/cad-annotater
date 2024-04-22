@@ -145,7 +145,6 @@ $(document).ready(function() {
             // Remove connected edges from frontend
             edges.forEach(edge => {
                 if (edge.node1 === obj) {
-                    canvas.remove(edge)
                     edge.set({
                         top: obj.top,
                         left: obj.left
