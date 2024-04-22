@@ -147,13 +147,11 @@ $(document).ready(function() {
                 if (edge.node1 === obj) {
                     canvas.remove(edge)
                     edge.set({
-                        node1: obj,
                         top: obj.top,
                         left: obj.left
                     })
                 } else if (edge.node2 === obj) {
                     edge.set({
-                        node2: obj,
                         x2: obj.left,
                         y2: obj.top
                     })
