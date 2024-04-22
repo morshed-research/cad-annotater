@@ -241,12 +241,14 @@ $(document).ready(function() {
     }
 
     function handleMouseUp(options) {
-        if (move_nodes) {
+        if (move_nodes && tempLine != null) {
             var groupIndex = nodes.findIndex(g => g.id === tempLine.id);
-            nodes[groupIndex] = tempLine;
+            if (groupIndex != -1) {
+                nodes[groupIndex] = tempLine;
 
-            updateEdges(tempLine);
-            tempLine = null;
+                updateEdges(tempLine);
+                tempLine = null;
+            }
         } else {
             finalizeTempLine(options);
         }
