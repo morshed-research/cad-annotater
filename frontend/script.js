@@ -362,6 +362,9 @@ $(document).ready(function() {
         // canvas.clear();
         nodes = [];  // Clear existing nodes array
         edges = [];  // Clear existing edges array
+        nodeIdCounter = 1;
+
+        var max_id = 0;
         
         var scale = backgroundImage ? backgroundImage.scaleX : 1; 
         offsetX = backgroundImage ? backgroundImage.left * scale : 0;
@@ -369,7 +372,12 @@ $(document).ready(function() {
 
         jsonObj.nodes.forEach(node => {
             addNode(node.x * img_scale + offsetX, node.y * img_scale + offsetY, node.id, node.name);
+            if (node.id > max_id) {
+                max_id = node.id
+            }
         });
+
+        nodeIdCounter = max_id + 1;
 
         jsonObj.edges.forEach(edge => {
             var node1 = nodes.find(n => n.id === edge.id_1);
