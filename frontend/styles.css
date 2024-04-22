@@ -92,9 +92,23 @@ button, .custom-file-upload {
     cursor: not-allowed; /* Show that the button is not clickable */
 }
 
+#mode-button {
+    background-color: grey; /* Disabled look for Delete button */
+}
+
 /* Add classes for active states */
 .edit-active {
     background-color: red !important; /* Red when editing */
+}
+
+.mode-inactive {
+    background-color: blueviolet !important; /* Red when editing */
+    cursor: grab;
+}
+
+.mode-active {
+    background-color: rgb(137, 148, 53) !important; /* Red when editing */
+    cursor: pointer;
 }
 
 .delete-active {

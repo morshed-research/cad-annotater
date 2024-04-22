@@ -8,6 +8,7 @@ $(document).ready(function() {
 
     // Initially disable the delete button
     $('#delete-button').prop('disabled', true);
+    $('#mode-button').prop('disabled', true);
     
     var img_scale, offsetX, offsetY;
     var nodes = [], edges = [];
@@ -15,6 +16,7 @@ $(document).ready(function() {
     var isDragging = false, editMode = false;
     var DRAG_THRESHOLD = 10, clickStartX = 0, clickStartY = 0;
     var backgroundImage = canvas.backgroundImage;
+    var move_nodes = false;
 
     $('#edit-button').prop('disabled', true);
 
@@ -137,6 +139,30 @@ $(document).ready(function() {
             canvas.requestRenderAll();
         }
     }
+
+    function updateEdges(obj) {
+        if (obj.type === 'group') {
+            // Remove connected edges from frontend
+            edges.forEach(edge => {
+                if (edge.node1 === obj) {
+                    canvas.remove(edge)
+                    edge.set({
+                        node1: obj,
+                        top: obj.top,
+                        left: obj.left
+                    })
+                } else if (edge.node2 === obj) {
+                    edge.set({
+                        node2: obj,
+                        x2: obj.left,
+                        y2: obj.top
+                    })
+                }
+            });
+        } 
+
+        canvas.requestRenderAll();
+    }
     
     function removeNodeAndConnectedEdges(obj) {
         if (obj.type === 'group') {
@@ -158,6 +184,7 @@ $(document).ready(function() {
     // Event handlers
     $('#upload-file').change(handleFileUpload);
     $('#edit-button').click(toggleEditMode);
+    $('#mode-button').click(toggleMode);
     canvas.on({ 'mouse:down': handleMouseDown, 'mouse:move': handleMouseMove, 'mouse:up': handleMouseUp });
 
     function handleFileUpload(e) {
@@ -191,8 +218,11 @@ $(document).ready(function() {
         clickStartX = options.e.clientX;
         clickStartY = options.e.clientY;
         isDragging = false;
-
-        if (editMode && options.target && options.target.type === 'group') {
+        
+        if (move_nodes) {
+            tempLine = findTargetNode(options.pointer.x, options.pointer.y);
+            console.log(tempLine)
+        } else if (editMode && options.target && options.target.type === 'group') {
             initiateTempLine(options);
         }
     }
@@ -202,14 +232,26 @@ $(document).ready(function() {
             isDragging = true;
         }
 
-        if (tempLine) {
+        if (tempLine && move_nodes) {
+            tempLine.set({ left : options.pointer.x, top : options.pointer.y });
+            tempLine.setCoords();
+            canvas.renderAll();
+        } else if (tempLine) {
             tempLine.set({ x2: options.pointer.x, y2: options.pointer.y });
             canvas.renderAll();
         }
     }
 
     function handleMouseUp(options) {
-        finalizeTempLine(options);
+        if (move_nodes) {
+            var groupIndex = nodes.findIndex(g => g.id === tempLine.id);
+            nodes[groupIndex] = tempLine;
+
+            updateEdges(tempLine);
+            tempLine = null;
+        } else {
+            finalizeTempLine(options);
+        }
     }
 
     function initiateTempLine(options) {
@@ -239,6 +281,7 @@ $(document).ready(function() {
             firstNode = null;
         } else if (editMode && !isDragging && !options.target) {
             addNode(options.pointer.x, options.pointer.y, ++nodeIdCounter);
+            $('#mode-button').prop('disabled', false).addClass('mode-inactive');
         }
         isDragging = false;
     }
@@ -313,6 +356,7 @@ $(document).ready(function() {
             }
         };
         reader.readAsText(file);
+        $('#mode-button').prop('disabled', false).addClass('mode-inactive');
     }
 
     // Function to load graph from JSON object
@@ -383,11 +427,31 @@ $(document).ready(function() {
     
         // Toggle button colors and activation based on edit mode
         if (editMode) {
+            if (nodes.length > 0) {
+                $('#mode-button').prop('disabled', false).addClass('mode-inactive');
+            }
             $('#edit-button').addClass('edit-active'); // Turn edit button red
             $('#delete-button').removeClass('delete-inactive').addClass('delete-active').prop('disabled', false); // Enable and turn delete button red
         } else {
             $('#edit-button').removeClass('edit-active'); // Revert edit button to green
             $('#delete-button').addClass('delete-inactive').removeClass('delete-active').prop('disabled', true); // Disable and revert delete button to grey
+            $('#mode-button').removeClass('mode-active').removeClass('mode-inactive').prop('disabled', true)
+            move_nodes = false;
+        }
+    }
+
+    // mode button 
+    function toggleMode() {
+        if (editMode) {
+            move_nodes = !move_nodes;
+        }
+        $('#mode-button').text(move_nodes ? 'Add Edges' : 'Move Nodes');
+    
+        // Toggle button colors and activation based on edit mode
+        if (move_nodes) {
+            $('#mode-button').removeClass('mode-inactive').addClass('mode-active'); // Turn edit button red
+        } else {
+            $('#mode-button').removeClass('mode-active').addClass('mode-inactive'); // Revert edit button to green
         }
     }
     
