@@ -15,6 +15,7 @@ $(document).ready(function() {
     var isDragging = false, editMode = false;
     var DRAG_THRESHOLD = 10, clickStartX = 0, clickStartY = 0;
     var backgroundImage = canvas.backgroundImage;
+    var isShiftPressed = false;
 
     $('#edit-button').prop('disabled', true);
 
@@ -23,7 +24,6 @@ $(document).ready(function() {
 
         // Retrieve the current node size from the slider
         var size = parseInt(document.getElementById('node-size-slider').value, 10);
-
 
         var circle = new fabric.Circle({
             id: nodeId,
@@ -187,13 +187,27 @@ $(document).ready(function() {
         $('#edit-button').text(editMode ? 'Stop Editing' : 'Start Editing');
     }
 
-    function handleMouseDown(options) {
-        clickStartX = options.e.clientX;
-        clickStartY = options.e.clientY;
-        isDragging = false;
 
-        if (editMode && options.target && options.target.type === 'group') {
-            initiateTempLine(options);
+    function handleShiftlMouseDown(options) {
+        if (options.target.type == 'group') {
+            options.target.lockMovementX = false;
+            options.target.lockMovementY = false;
+        }
+    }
+
+    function handleMouseDown(options) {
+
+        // Handle moving a node
+        if (isShiftPressed) {
+            handleShiftlMouseDown(options);
+        } else {
+            clickStartX = options.e.clientX;
+            clickStartY = options.e.clientY;
+            isDragging = false;
+
+            if (editMode && options.target && options.target.type === 'group') {
+                initiateTempLine(options);
+            }
         }
     }
 
@@ -202,6 +216,27 @@ $(document).ready(function() {
             isDragging = true;
         }
 
+        // Move edges ith the nodes
+        if (isShiftPressed) {
+            for (var i = 0; i < edges.length; i++) {
+                var edge = edges[i];
+                if (edge.node1.id == options.target.id) {
+                    edge.set({
+                        node1: options.target,
+                        x1: options.target.left,
+                        y1: options.target.top,
+                    });
+                } else if (edge.node2.id == options.target.id) {
+                    edge.set({
+                        node2: options.target,
+                        x2: options.target.left,
+                        y2: options.target.top,
+                    });
+                }
+            } 
+        }
+
+        // Move the line we are drawing
         if (tempLine) {
             tempLine.set({ x2: options.pointer.x, y2: options.pointer.y });
             canvas.renderAll();
@@ -209,7 +244,40 @@ $(document).ready(function() {
     }
 
     function handleMouseUp(options) {
-        finalizeTempLine(options);
+        if(isShiftPressed) {
+            if (options.target.type == 'group') {
+                // Lock movement
+                options.target.lockMovementX = true;
+                options.target.lockMovementY = true;
+
+                // Update x and y coordinates of the group
+                options.target.set({
+                    left: options.pointer.x,
+                    top: options.pointer.y
+                })
+
+                // Get Edges and Update them
+                for (var i = 0; i < edges.length; i++) {
+                    var edge = edges[i];
+                    if (edge.node1.id == options.target.id) {
+                        edge.set({
+                            node1: options.target,
+                            x1: options.target.left,
+                            y1: options.target.top,
+                        });
+                    } else if (edge.node2.id == options.target.id) {
+                        edge.set({
+                            node2: options.target,
+                            x2: options.target.left,
+                            y2: options.target.top,
+                        });
+                    }
+                }
+            }
+        } else {
+            finalizeTempLine(options);
+        }
+
     }
 
     function initiateTempLine(options) {
@@ -382,6 +450,19 @@ $(document).ready(function() {
         });
     
         canvas.renderAll(); // Refresh the canvas to display the updated sizes
+    });
+
+    // Detect Shift key press and release
+    $(document).keydown(function(e) {
+        if (e.key === 'Shift') {
+            isShiftPressed = true;
+        }
+    });
+
+    $(document).keyup(function(e) {
+        if (e.key === 'Shift') {
+            isShiftPressed = false;
+        }
     });
     
     // Edit button 
